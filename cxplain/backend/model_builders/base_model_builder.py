@@ -22,13 +22,13 @@ import tensorflow as tf
 from functools import partial
 import tensorflow.keras.backend as K
 from abc import ABCMeta, abstractmethod
-from tensorflow.python.keras.models import Model
+from tensorflow.keras.models import Model
 from cxplain.backend.validation import Validation
 from cxplain.backend.causal_loss import causal_loss
 from cxplain.backend.masking.masking_util import MaskingUtil
-from tensorflow.python.keras.backend import resize_images, resize_volumes
-from tensorflow.python.keras.callbacks import ModelCheckpoint, EarlyStopping
-from tensorflow.python.keras.layers import Input, Dense, Flatten, Lambda, Reshape
+from tensorflow.keras.backend import resize_images, resize_volumes
+from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping
+from tensorflow.keras.layers import Input, Dense, Flatten, Lambda, Reshape
 
 
 @six.add_metaclass(ABCMeta)
@@ -64,7 +64,7 @@ class BaseModelBuilder(object):
             raise ValueError("Attribution downsampling is not supported for variable length inputs. "
                              "Please pad your data samples to the same size to use downsampling.")
 
-        input_shape = (input_dim,) if not isinstance(input_dim, collections.Sequence) else input_dim
+        input_shape = (input_dim,) if not isinstance(input_dim, collections.abc.Sequence) else input_dim
         input_layer = Input(shape=input_shape)
         last_layer = self.build(input_layer)
 
@@ -95,11 +95,11 @@ class BaseModelBuilder(object):
         causal_loss_fun.__name__ = "causal_loss"
 
         if downsampling_factor != 1:
-            last_layer = Reshape(tuple(steps) + (1,))(last_layer)
+            last_layer = Reshape(tuple([int(s) for s in steps]) + (1,))(last_layer)
 
             if len(steps) == 1:
                 # Add a dummy dimension to enable usage of __resize_images__.
-                last_layer = Reshape(tuple(steps) + (1, 1))(last_layer)
+                last_layer = Reshape(tuple([int(s) for s in steps]) + (1, 1))(last_layer)
                 last_layer = Lambda(lambda x: resize_images(x,
                                                             height_factor=downsample_factors[0],
                                                             width_factor=1,
@@ -159,6 +159,7 @@ class BaseModelBuilder(object):
                       metrics=metrics)
         return model
 
+    @tf.function
     def fit(self, model, precomputed, y, model_filepath):
         callbacks = [
             ModelCheckpoint(filepath=model_filepath,
@@ -175,7 +176,7 @@ class BaseModelBuilder(object):
                             # We must feed two extra outputs due to a bug in TensorFlow < 1.15.0rc0 that would not
                             # allow saving models without connecting all inputs to output nodes.
                             # See https://github.com/tensorflow/tensorflow/pull/30244
-                            y=[y, y, y],
+                            y=y,#[y, y, y],
                             batch_size=self.batch_size,
                             shuffle=self.shuffle,
                             validation_split=self.validation_fraction,

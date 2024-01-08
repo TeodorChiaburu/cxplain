@@ -19,6 +19,7 @@ import os
 import json
 import pickle
 import numpy as np
+import tensorflow as tf
 from cxplain.explanation_model import CXPlain
 from cxplain.backend.validation import Validation
 from tensorflow.python.keras.losses import categorical_crossentropy
@@ -151,6 +152,7 @@ class TensorflowCXPlain(CXPlain):
 
             self.model, self.prediction_model = build_fun(input_dim=p, output_dim=output_dim)
 
+    @tf.function
     def _fit_single(self, model, X, y, masked_data=None):
         Validation.check_dataset(X, y)
 
