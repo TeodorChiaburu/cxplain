@@ -18,8 +18,8 @@ DEALINGS IN THE SOFTWARE.
 import numpy as np
 import tensorflow as tf
 from nose.tools import nottest
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble.forest import RandomForestClassifier
+from sklearn.linear_model.logistic import LogisticRegression
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
 
 

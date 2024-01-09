@@ -17,7 +17,6 @@ DEALINGS IN THE SOFTWARE.
 """
 import itertools
 import collections
-import tensorflow as tf
 import numpy as np
 from cxplain.backend.validation import Validation
 from cxplain.backend.numpy_math_interface import NumpyInterface
@@ -26,7 +25,7 @@ from cxplain.backend.numpy_math_interface import NumpyInterface
 class MaskingUtil(object):
     @staticmethod
     def get_input_constants(input_dim, downsample_factors):
-        if not isinstance(input_dim, collections.abc.Sequence):
+        if not isinstance(input_dim, collections.Sequence):
             input_dim = (input_dim,)
 
         if len(input_dim) > 1:
@@ -62,7 +61,7 @@ class MaskingUtil(object):
 
     @staticmethod
     def extract_downsample_factors(downsample_factors, expected_length):
-        if not isinstance(downsample_factors, collections.abc.Sequence):
+        if not isinstance(downsample_factors, collections.Sequence):
             downsample_factors = (downsample_factors,)
 
         if len(downsample_factors) == 1:
@@ -195,7 +194,6 @@ class MaskingUtil(object):
 
     @staticmethod
     def get_prediction(model, x, flatten=False):
-        tf.compat.v1.enable_eager_execution()
         if flatten:
             x = np.reshape(x, (len(x), -1))
 

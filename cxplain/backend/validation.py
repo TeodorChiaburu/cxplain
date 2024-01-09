@@ -33,7 +33,7 @@ class Validation(object):
     @staticmethod
     def flatten(arr):
         for x in arr:
-            if isinstance(x, collections.abc.Iterable) and not isinstance(x, (str, bytes)):
+            if isinstance(x, collections.Iterable) and not isinstance(x, (str, bytes)):
                 for sub_x in Validation.flatten(x):
                     yield sub_x
             else:
@@ -42,7 +42,7 @@ class Validation(object):
     @staticmethod
     def check_downsample_factors_at_initialisation(downsample_factors):
         original_downsample_factors = downsample_factors
-        if not isinstance(downsample_factors, collections.abc.Sequence):
+        if not isinstance(downsample_factors, collections.Sequence):
             downsample_factors = (downsample_factors,)
 
         for factor in downsample_factors:
@@ -96,7 +96,7 @@ class Validation(object):
                              "to (num_samples, 1).")
 
         while len(probe_dims) > 1 and \
-              (probe_dims[0] == 0 or isinstance(probe[0], collections.abc.Sequence) or isinstance(probe[0], np.ndarray)):
+              (probe_dims[0] == 0 or isinstance(probe[0], collections.Sequence) or isinstance(probe[0], np.ndarray)):
             is_fixed_size = np.all(list(Validation.flatten(Validation.get_at_level(len(probe), X, level))))
             if is_fixed_size:
                 input_dim += [len(probe)]
@@ -117,13 +117,13 @@ class Validation(object):
 
         # Must be (num_samples,) for regression and (num_samples, num_classes) for classification
         # NOTE: binary classification must be (num_samples, 2) to differentiate from regression.
-        is_array = isinstance(y[0], collections.abc.Sequence) or isinstance(y[0], np.ndarray)
+        is_array = isinstance(y[0], collections.Sequence) or isinstance(y[0], np.ndarray)
         output_dim = len(y[0]) if is_array else 1
         return output_dim
 
     @staticmethod
     def get_full_input_shape(num_samples, input_dim):
-        if not isinstance(input_dim, collections.abc.Sequence):
+        if not isinstance(input_dim, collections.Sequence):
             input_dim = (input_dim,)
 
         full_shape = (num_samples,) + input_dim
